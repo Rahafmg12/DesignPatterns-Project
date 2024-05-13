@@ -1,13 +1,23 @@
 import java.util.ArrayList;
 import java.util.List;
 
-interface CoffeeMachineObserver {
-    void update(int remainingCups);
+
+
+
+
+abstract class Observer {
+    public abstract void update(int remainingCups);
 }
 
-class CoffeeMachine {
+
+
+
+
+
+
+class Subject {
     private int remainingCups;
-    private List<CoffeeMachineObserver> observers = new ArrayList<>();
+    private List<Observer> observers = new ArrayList<>();
 
     public int getRemainingCups() {
         return remainingCups;
@@ -18,32 +28,38 @@ class CoffeeMachine {
         notifyObservers();
     }
 
-    public void addObserver(CoffeeMachineObserver observer) {
+    public void addObserver(Observer observer) {
         observers.add(observer);
     }
 
-    public void removeObserver(CoffeeMachineObserver observer) {
+    public void removeObserver(Observer observer) {
         observers.remove(observer);
     }
 
     private void notifyObservers() {
-        for (CoffeeMachineObserver observer : observers) {
+        for (Observer observer : observers) {
             observer.update(remainingCups);
         }
     }
 }
 
-class Order implements CoffeeMachineObserver {
-    private Coffee coffee;
+
+
+
+
+
+
+class Order extends Observer {
+    private String coffeeName;
     private int cups;
 
-    public Order(Coffee coffee, int cups) {
-        this.coffee = coffee;
+    public Order(String coffeeName, int cups) {
+        this.coffeeName = coffeeName;
         this.cups = cups;
     }
 
-    public Coffee getCoffee() {
-        return coffee;
+    public String getCoffeeName() {
+        return coffeeName;
     }
 
     public int getCups() {
@@ -56,37 +72,43 @@ class Order implements CoffeeMachineObserver {
     }
 }
 
-class Coffee {
+
+
+
+
+
+
+class Customer extends Observer {
     private String name;
-    private double price;
 
-    public Coffee(String name, double price) {
+    public Customer(String name) {
         this.name = name;
-        this.price = price;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public double getPrice() {
-        return price;
+    @Override
+    public void update(int remainingCups) {
+        System.out.println("Customer " + name + " received update: " + remainingCups + " cups remaining");
     }
 }
 
+
+
+
+
+
 public class Main {
     public static void main(String[] args) {
-        CoffeeMachine coffeeMachine = new CoffeeMachine();
+        Subject coffeeMachine = new Subject();
 
-        Coffee espresso = new Coffee("Espresso", 1.5);
-        Coffee latte = new Coffee("Latte", 2.5);
-        Coffee cappuccino = new Coffee("Cappuccino", 3.0);
-
-        Order order1 = new Order(espresso, 2);
-        Order order2 = new Order(latte, 1);
+        Order order1 = new Order("Espresso", 2);
+        Order order2 = new Order("Latte", 1);
+        Customer customer1 = new Customer("Raghad");
+        Customer customer2 = new Customer("Rahaf");
 
         coffeeMachine.addObserver(order1);
         coffeeMachine.addObserver(order2);
+        coffeeMachine.addObserver(customer1);
+        coffeeMachine.addObserver(customer2);
 
         coffeeMachine.setRemainingCups(10);
     }
